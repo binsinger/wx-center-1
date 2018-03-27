@@ -1,0 +1,40 @@
+@charset "utf-8";
+@import "./variables";
+@import './utils';
+
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: @font-family;
+  line-height: 1;
+  font-size: 0;
+  box-sizing: border-box;
+}
+
+html,body{
+  background: @body-color;
+  -webkit-justify-content: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+li {
+  list-style: none
+}
+.wrap{
+  width:340/@design-width * 100%;
+}
+//.theme-color{
+//  color:@theme-color;
+//}
+//.theme-bg-color{
+//  background:@theme-color;
+//}
+//.theme-border-color{
+//  border-color:@theme-color;
+//}
