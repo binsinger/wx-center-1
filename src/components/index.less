@@ -75,6 +75,13 @@
         .font-line(24, 50);
         border-bottom-left-radius: 90px/10px;
         border-bottom-right-radius: 90px/10px;
+        img{
+          .wh(12,20);
+          transform: rotate(90deg);
+          -webkit-transform: rotate(90deg);
+          display: inline-block;
+          .mleft(8);
+        }
       }
     }
     .sign-drop {
@@ -309,6 +316,7 @@
       background: url('../assets/images/icon-2.png') no-repeat center center;
       background-size: 100% auto;
       .mright(10);
+      vertical-align: middle;
     }
     .notice-box {
       .height(36);
@@ -323,7 +331,7 @@
           justify-content: space-between;
           p {
             .font-line(24, 36);
-            color: @black;
+            color: #6d6c6c;
             display: block;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -350,7 +358,7 @@
       overflow: hidden;
       p {
         .font-line(30, 45);
-        color: @black;
+        color: #6d6c6c;
         text-align: center;
         .mbottom(10);
         a {
@@ -361,14 +369,17 @@
         .font-line(48, 72);
         text-align: center;
         display: inline-block;
+        position: relative;
         i {
-          content: "";
+          position: absolute;
+          top:0;
+          bottom:0;
+          .right(-40);
+          margin:auto 0;
+          z-index:1;
           .wh(30, 30);
-          display: inline-block;
-          vertical-align: middle;
+          display: block;
           border-radius: 50%;
-          .mleft(20);
-          .mtop(-4);
           img {
             width: auto;
             .height(19);
@@ -387,8 +398,8 @@
         width: 33.3333%;
         .padding(25, 5,0);
         a {
-          color: #050505;
-          .font-line(26, 32);
+          color: #6d6c6c;
+          .font-line(24, 32);
           display: block;
           text-align: center;
           i {
@@ -415,23 +426,21 @@
     .mtop(22);
     .mbottom(22);
     h5 {
-      .font-line(26, 34);
-      color: #313131;
+      .font-line(24, 34);
+      color: #6d6c6c;
       .padding(30);
-      &:before {
-        content: "";
+      i {
         display: inline-block;
         vertical-align: middle;
-        .wh(5, 34);
+        .wh(5, 30);
         .mright(16);
-        background: #030303;
         .border-radius(3);
         .mtop(-4);
       }
       a {
         float: right;
-        .font-line(24, 34);
-        color: #747373;
+        .font-line(22, 34);
+        color: #6d6c6c;
         &:after {
           content: "";
           .wh(10, 18);
@@ -446,7 +455,7 @@
       .margin(0, 30);
       li {
         .bordertop(1, solid, #e5e5e5);
-        .padding(27, 0);
+        .padding(27, 0,27,21);
         position: relative;
         p {
           .font-line(26, 39);
@@ -485,7 +494,6 @@
   }
   .active-item {
     .margin(22, 0);
-    .padding(0, 30);
     display: block;
     img {
       width: 100%;
@@ -500,13 +508,11 @@
       .font-line(26, 34);
       color: #313131;
       .padding(30);
-      &:before {
-        content: "";
+      i {
         display: inline-block;
         vertical-align: middle;
-        .wh(5, 34);
+        .wh(5, 30);
         .mright(16);
-        background: #030303;
         .border-radius(3);
         .mtop(-4);
       }

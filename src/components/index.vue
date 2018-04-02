@@ -12,7 +12,7 @@
         </div>
       </a>
       <div class="btn-sign-down theme-bg-color" :style="{'background-color':word}" @click="show = !show">
-        <p class="theme-bg-color" :style="{'background-color':word}">签到有礼</p>
+        <p class="theme-bg-color" :style="{'background-color':word}">签到有礼<img src="../assets/images/icon-1.png"/></p>
       </div>
       <transition name="down">
         <div class="sign-box" v-show="show">
@@ -71,11 +71,15 @@
         </div>
       </transition>
     </div>
-    <div class="notice">
+    <div class="notice" v-if="notice.show">
       <div class="notice-box">
         <ul class="notice-list" :class="{anim:animate==true}">
           <li v-for="list in noticeList">
-            <a :href="list.link">
+            <a :href="list.link" v-if="list.link !== ''">
+              <p>{{list.content}}</p>
+              <i v-if="list.link !== ''"></i>
+            </a>
+            <a href="javascript:void(0);" v-if="list.link == ''">
               <p>{{list.content}}</p>
               <i v-if="list.link !== ''"></i>
             </a>
@@ -102,13 +106,17 @@
         </li>
       </ul>
     </div>
-    <div class="integral-task">
+    <div class="integral-task" v-if="taskInvite.show">
       <!--<h5>{{task.name}}<a :href="task.link">更多</a></h5>-->
-      <h5>{{taskName}}</h5>
+      <h5><i :style="{'background-color':word}"></i>{{taskName}}</h5>
       <ul>
         <li class="task-link">
-          <a :href="taskInvite.link">
-            <p>邀请好友关注</p>
+          <a :href="taskInvite.link" v-if="taskInvite.link !== ''">
+            <p>邀请好友</p>
+            <!--<span>{{taskInvite.rule}}</span>-->
+          </a>
+          <a href="javascript:void(0);" v-if="taskInvite.link == ''">
+            <p>邀请好友</p>
             <!--<span>{{taskInvite.rule}}</span>-->
           </a>
         </li>
@@ -120,17 +128,21 @@
         <!--<div class="task-complete">已完成</div>-->
         <!--</li>-->
       </ul>
-
     </div>
     <div class="active-item" v-for="ad in adList" :key="ad.id">
-      <a :href="ad.link">
+      <a :href="ad.link" v-if="ad.link !== ''">
+        <img :src="ad.img"/>
+      </a>
+      <a href="javascript:void(0);" v-if="ad.link == ''">
         <img :src="ad.img"/>
       </a>
     </div>
-    <div class="sale">
-      <h5>
+    <div class="sale" v-if="shop.show">
+      <h5><i :style="{'background-color':word}"></i>
         {{shop.name}}
-        <a :href="shop.link" class="theme-color theme-border-color"
+        <a :href="shop.link" v-if="shop.link !== ''" class="theme-color theme-border-color"
+           :style="{'color':word,'border-color':word}">前往商城</a>
+        <a href="javascript:void(0);"  v-if="shop.link == ''" class="theme-color theme-border-color"
            :style="{'color':word,'border-color':word}">前往商城</a>
       </h5>
       <div class="sale-list">
@@ -161,13 +173,17 @@
           scoreLink: "",
           mpname: ""
         },
-        noticeName: "",
+        notice: {
+          name:"",
+          show:false
+        },
         noticeList: [],
         adList: [],
         taskName: "",
         taskInvite: {
           link: "",
-          rule: ""
+          rule: "",
+          show:false
         },
         module: [],
         userInfo: {
@@ -177,7 +193,8 @@
         },
         shop: {
           name: "",
-          link: ""
+          link: "",
+          show: false
         },
         shopList: {},
         signstate: {
@@ -196,6 +213,7 @@
     created() {
       this.url = window.location.origin
       this.mpid = this.init("mpid")
+//      this.mpid = 18
       this.load();
       this.timeFun();
       this.setIn = setInterval(this.scroll, 3000)
@@ -232,13 +250,15 @@
               }
               if (userReault[i].class == 'Notice') {
                 this.noticeList = userReault[i].list
-                this.noticeName = userReault[i].name
+                this.notice.show = true
+                this.notice.name = userReault[i].name
               }
               if (userReault[i].class == 'Ad') {
                 this.adList = userReault[i].list
               }
               if (userReault[i].class == 'Task') {
                 this.taskName = userReault[i].name
+                this.taskInvite.show = true
                 this.taskInvite.link = userReault[i].invite.link
                 this.taskInvite.rule = userReault[i].invite.rule
               }
@@ -255,6 +275,7 @@
                 this.userInfo.link = userReault[i].link
               }
               if (userReault[i].class == 'Shop') {
+                this.shop.show = true
                 this.shop.name = userReault[i].name
                 this.shop.link = userReault[i].link
                 this.shopList = userReault[i].list
@@ -325,6 +346,7 @@
         }).then((result) => {
           if (result.data.e == '9999') {
             this.signstate.todaySign = 1;
+            this.signstate.days = Number(this.signstate.days) + 1;
           }
         }).catch((result) => {
         })

@@ -1,0 +1,27 @@
+@import '../../less/utils';
+.topbar-wrap{
+  display: flex;
+  background: #ff7200;
+  justify-content: space-between;
+  align-items: center;
+  .pleft(36);
+  .pright(36);
+  .back{
+    .wh(17,29);
+    display: block;
+    background: url('../../assets/images/icon-back.png') no-repeat center center;
+    background-size:100% auto;
+  }
+  p{
+    .font-line(28,80);
+    color:@white;
+    .height(80);
+  }
+  .home{
+    .wh(39,38);
+    display: block;
+    background: url('../../assets/images/icon-home.png') no-repeat center center;
+    background-size:100% auto;
+  }
+}
+
