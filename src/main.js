@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import router from './router'
 import axios from 'axios'
+import $ from 'jquery'
 
 Vue.prototype.$http= axios
 

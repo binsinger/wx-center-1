@@ -564,10 +564,105 @@
 
 .down-enter-active, .down-leave-active {
   transform: translateY(0);
-  transition: all .3s ease;
+  transition: all .3s ease-in;
 }
 
 .down-enter, .down-leave-to {
   transform: translateY(-400px);
-  transition: all .3s ease;
+  transition: all .3s ease-in;
+}
+
+.sign-modal-box{
+  position: fixed;
+  z-index:999;
+  background: none;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  .sign-modal-inner{
+    position: absolute;
+    z-index:1;
+    background: #6f6d6b;
+    .border-radius(4);
+    left:0;
+    right:0;
+    top:50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    .width(500);
+    .padding(20,0);
+    text-align: center;
+    margin:0 auto;
+    p{
+      .font-line(24,30);
+      color:#f9f8f7;
+      span{
+        color:#f00;
+        .font-line(30,30);
+      }
+    }
+  }
+}
+
+.rule-modal-box{
+  background: rgba(0,0,0,0.5);
+  position: fixed;
+  z-index:999;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  .rule-modal-inner{
+    background: @white;
+    .border-radius(5);
+    width: 80%;
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+    .padding(30);
+    h5{
+      .font-line(30,30);
+      text-align: center;
+      .padding(20,0);
+    }
+    p{
+      .font-line(26, 34);
+      .mtop(20);
+      .mbottom(20);
+      color: #6d6c6c;
+      .pleft(40);
+      position: relative;
+      &:before{
+        content:"";
+        .wh(26,34);
+        display: block;
+        position: absolute;
+        z-index: 1;
+        top:0;
+        left:0;
+        background: url('../assets/images/icon-5.png') no-repeat center center;
+        background-size: 100% auto;
+        vertical-align: middle;
+        .mright(10);
+      }
+      span{
+        .font-line(26, 34);
+        .margin(0,10);
+      }
+    }
+    .btn-sure{
+      .font-line(30,70);
+      text-align: center;
+      color:@white;
+      .wh(200,70);
+      display: block;
+      margin:0 auto;
+      .mtop(40);
+      .mbottom(20);
+      .border-radius(5);
+    }
+  }
 }

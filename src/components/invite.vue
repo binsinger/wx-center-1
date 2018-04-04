@@ -19,6 +19,9 @@
         <p class="info">请长按识别以上二维码关注<br>互动开发测试 公众号</p>
       </div>
     </div>
+    <router-link to="./invite">
+      <div style="font-size:20px;color:#000">测试</div>
+    </router-link>
   </div>
 </template>
 

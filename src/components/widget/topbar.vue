@@ -1,5 +1,5 @@
 <template>
-<div class="topbar-wrap">
+  <div class="topbar-wrap">
   <span class="back" @click="back"></span>
   <p>二级标题页面</p>
   <router-link to="/index">

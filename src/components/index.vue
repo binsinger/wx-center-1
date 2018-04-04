@@ -11,7 +11,7 @@
           <span></span>
         </div>
       </a>
-      <div class="btn-sign-down theme-bg-color" :style="{'background-color':word}" @click="show = !show">
+      <div class="btn-sign-down theme-bg-color" :style="{'background-color':word}" @click="signBtn">
         <p class="theme-bg-color" :style="{'background-color':word}">签到有礼<img src="../assets/images/icon-1.png"/></p>
       </div>
       <transition name="down">
@@ -19,21 +19,21 @@
           <div class="sign-drop">
             <img src="/wap/center/static/img/head-bg.jpg"/>
             <div class="sign-inner">
-              <div class="sign-text" v-if="signstate.todaySign==0" @click="signFun">
+              <div class="sign-text" v-if="signstate.todaySign===0" @click="signFun">
                 <p class="theme-color" :style="{'color':word}">签到</p>
               </div>
-              <div class="sign-success" v-if="signstate.todaySign==1">
+              <div class="sign-success" v-if="signstate.todaySign===1" @click="signFun">
                 <span class="theme-color" :style="{'color':word}">已连续签到</span>
                 <p class="theme-color" :style="{'color':word}">{{signstate.days}}天</p>
               </div>
               <div class="sign-handle">
-                <a :href="signstate.ruleLink">签到规则</a>
+                <a href="javascript:void(0);" @click="signRuleFun">签到规则</a>
                 <!--<a href="javascript:void(0);"><i></i>明日提醒</a>-->
               </div>
             </div>
           </div>
           <div class="sign-date">
-            <div class="sign-date-inner">
+            <div class="sign-date-inner" id="sign-date-inner">
               <div class="date-box" v-for="sign in signArray">
                 <div class="date date-before-sign-in" v-if="sign.type ==='before' && sign.signTag ===1">
                   <i :style="{'background-color':word}">
@@ -142,7 +142,7 @@
         {{shop.name}}
         <a :href="shop.link" v-if="shop.link !== ''" class="theme-color theme-border-color"
            :style="{'color':word,'border-color':word}">前往商城</a>
-        <a href="javascript:void(0);"  v-if="shop.link == ''" class="theme-color theme-border-color"
+        <a href="javascript:void(0);" v-if="shop.link == ''" class="theme-color theme-border-color"
            :style="{'color':word,'border-color':word}">前往商城</a>
       </h5>
       <div class="sale-list">
@@ -151,6 +151,24 @@
           <p>{{sale.name}}</p>
           <span class="theme-color" :style="{'color':word}">{{sale.need_score}}积分+{{sale.need_money}}元</span>
         </a>
+      </div>
+    </div>
+
+    <!--rule-->
+    <div class="rule-modal-box" v-show="signRuleShow">
+      <div class="rule-modal-inner">
+        <h5 :style="{'color':word}">签到规则</h5>
+        <p>每天签到可获得<span :style="{'color':word}">{{ruleBase}}</span>奖励</p>
+        <p v-for="rslist in ruleScoreList">连续<span :style="{'color':word}">{{rslist[0]}}</span>天签到后，每天额外奖励<span :style="{'color':word}">{{rslist[1]}}</span>奖励说明</p>
+        <p>每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>奖励</p>
+        <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure" @click="signRuleShow = !signRuleShow">确定</a>
+      </div>
+    </div>
+
+    <!--sign result-->
+    <div class="sign-modal-box" v-show="signModalShow">
+      <div class="sign-modal-inner">
+        <p v-html="signModalTitle">{{signModalTitle}}</p>
       </div>
     </div>
   </div>
@@ -165,7 +183,7 @@
         mpid: 0,
         animate: false,
         show: false,
-        setIn: "",
+        setInt: "",
         header: "",
         word: "",
         score: {
@@ -174,8 +192,8 @@
           mpname: ""
         },
         notice: {
-          name:"",
-          show:false
+          name: "",
+          show: false
         },
         noticeList: [],
         adList: [],
@@ -183,7 +201,7 @@
         taskInvite: {
           link: "",
           rule: "",
-          show:false
+          show: false
         },
         module: [],
         userInfo: {
@@ -207,16 +225,24 @@
         month: 1,
         monthNum: 31,
         day: 1,
-        signArray: []
+        signArray: [],
+        signModalTitle: "",
+        signModalLock: true,
+        signModalShow: false,
+        ruleScoreList:[],
+        ruleBase:0,
+        ruleFull:0,
+        signRuleShow:false,
+        signChange:0,
+        sinsetInt: "",
       }
     },
     created() {
       this.url = window.location.origin
       this.mpid = this.init("mpid")
-//      this.mpid = 18
       this.load();
       this.timeFun();
-      this.setIn = setInterval(this.scroll, 3000)
+      this.setInt = setInterval(this.scroll, 3000);
     },
     methods: {
       init(name) {
@@ -225,6 +251,7 @@
         if (r != null) return unescape(r[2]);
         return null;
       },
+      //页面初始化
       load() {
         this.$http({
           method: 'get',
@@ -269,7 +296,7 @@
                   img: userReault[i].icon_url
                 })
               }
-              if (userReault[i].calss == 'UserInfo') {
+              if (userReault[i].class == 'UserInfo') {
                 this.userInfo.nickname = userReault[i].nickname
                 this.userInfo.headimgurl = userReault[i].headimgurl
                 this.userInfo.link = userReault[i].link
@@ -320,13 +347,14 @@
               }
             }
             if (this.noticeList.length < 2) {
-              clearInterval(this.setIn)
+              clearInterval(this.setInt)
             }
+            this.signRule();
           }
         }).catch((result) => {
-
         })
       },
+      //notice 滚动
       scroll() {
         this.animate = true;
         setTimeout(() => {
@@ -335,7 +363,12 @@
           this.animate = false;
         }, 1000)
       },
+      //签到按钮
       signFun() {
+        if (!this.signModalLock) {
+          return false
+        }
+        this.signModalLock = !this.signModalLock;
         this.$http({
           method: 'get',
           url:this.signstate.signUrl,
@@ -346,11 +379,47 @@
         }).then((result) => {
           if (result.data.e == '9999') {
             this.signstate.todaySign = 1;
-            this.signstate.days = Number(this.signstate.days) + 1;
+            this.signstate.days++;
+            this.signChange = result.data.data.change
+            this.signModalTitle = '签到成功，恭喜您获得<span style="color:'+this.word+'">'+this.signChange+'</span>积分奖励'
+          } else if (result.data.e == '2951') {
+            this.signModalTitle = result.data.m
+          }
+          this.signModalShow = true;
+          this.signModalHide();
+        }).catch((result) => {
+        })
+      },
+      //签到完成提示浮层5s后隐藏
+      signModalHide(){
+        var that = this;
+         setTimeout(function(){
+           that.signModalShow = false;
+           that.signModalLock = !that.signModalLock;
+         },3000)
+      },
+      //签到规则
+      signRuleFun(){
+        this.signRuleShow = true
+      },
+      signRule(){
+        this.$http({
+          method: 'get',
+          url:this.signstate.ruleLink,
+//          url: 'api/center/wap/rule/sign.html',
+          params: {
+            mpid: this.mpid
+          }
+        }).then((result) => {
+          if (result.data.e == '9999') {
+              this.ruleScoreList = result.data.data.attach
+              this.ruleBase = result.data.data.base
+              this.ruleFull = result.data.data.full
           }
         }).catch((result) => {
         })
       },
+      //日期年月
       timeFun() {
         let year = new Date().getFullYear();
         let leap = 28;
@@ -360,11 +429,25 @@
         this.day = new Date().getDate();
         this.monthNum = monthDays[new Date().getMonth()]
       },
+      //平年 闰年
       isLeapYear(year) {
         return (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0);
+      },
+      //点击展开签到浮层
+      signBtn() {
+        this.show = !this.show
+        this.signScroll()
+      },
+      //打开签到浮层，今日需要默认在当前屏
+      signScroll() {
+        let w = $(".date").width();
+        if (this.day > 5) {
+          $('.sign-date-inner').animate({scrollLeft: (this.day - 5) * w}, 100);
+        }
       }
     }
   }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped src="./index.less" lang="less"></style>
+
