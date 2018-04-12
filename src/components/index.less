@@ -24,14 +24,6 @@
       .padding(80, 30, 78, 30);
       display: flex;
       align-items: center;
-      &:after {
-        content: "";
-        .wh(20, 34);
-        display: block;
-        background: url('../assets/images/icon-1.png') no-repeat center center;
-        background-size: 100% auto;
-        .mright(17);
-      }
     }
     .user-photo {
       .wh(143, 143);
@@ -49,7 +41,18 @@
       flex: 1;
       p {
         color: @white;
-        .font-line(30, 50);
+        .font-line(30, 34);
+        display: inline-block;
+        &:after {
+          content: "";
+          .wh(14, 34);
+          .mleft(20);
+          display: inline-block;
+          vertical-align: middle;
+          background: url('../assets/images/icon-1.png') no-repeat center center;
+          background-size: 100% auto;
+          .mtop(-5);
+        }
       }
       span {
         .font-line(24, 40);
@@ -57,13 +60,13 @@
       }
     }
     .btn-sign-down {
-      position: absolute;
-      z-index: 2;
+      position: fixed;
+      z-index: 99;
       color: @white;
       left: 0;
       right: 0;
       top: 0;
-      .height(6);
+      .height(10);
       p {
         position: absolute;
         .wh(173, 50);
@@ -89,8 +92,8 @@
     }
     .sign-box {
       background: @white;
-      position: absolute;
-      z-index: 3;
+      position: fixed;
+      z-index: 100;
       left: 0;
       right: 0;
       top: 0;
@@ -403,7 +406,7 @@
           display: block;
           text-align: center;
           i {
-            .wh(100, 100);
+            .wh(50, 50);
             display: block;
             margin: 0 auto;
             .mbottom(14);
@@ -422,13 +425,14 @@
     }
   }
   .integral-task {
-    background: @white;
-    .mtop(22);
     .mbottom(22);
     h5 {
       .font-line(24, 34);
       color: #6d6c6c;
-      .padding(30);
+      .ptop(30);
+      .pleft(0);
+      .pright(30);
+      .pbottom(30);
       i {
         display: inline-block;
         vertical-align: middle;
@@ -452,14 +456,15 @@
       }
     }
     ul {
-      .margin(0, 30);
+      background: @white;
+      .padding(0, 21);
       li {
-        .bordertop(1, solid, #e5e5e5);
-        .padding(27, 0,27,21);
+        .borderbottom(1, solid, #e5e5e5);
+        .padding(27, 0);
         position: relative;
         p {
           .font-line(26, 39);
-          color: #020202;
+          color: #444;
         }
         span {
           .font-line(24, 36);
@@ -469,6 +474,9 @@
           .font-line(24, 36);
           color: #898989;
         }
+      }
+      li:last-child{
+        border:none;
       }
       .task-link {
         a {
@@ -493,7 +501,7 @@
     
   }
   .active-item {
-    .margin(22, 0);
+    .margin(22, 0,0);
     display: block;
     img {
       width: 100%;
@@ -501,13 +509,14 @@
     }
   }
   .sale {
-    background: @white;
-    .mtop(22);
     .mbottom(22);
     h5 {
-      .font-line(26, 34);
-      color: #313131;
-      .padding(30);
+      .font-line(24, 34);
+      color: #6d6c6c;
+      .ptop(30);
+      .pleft(0);
+      .pright(30);
+      .pbottom(30);
       i {
         display: inline-block;
         vertical-align: middle;
@@ -521,13 +530,15 @@
         .font-line(24, 34);
         color: #747373;
         .border(1, @theme-color);
-        .padding(6, 16);
+        .padding(4, 16,6);
         .border-radius(16);
         .mtop(-6);
+        font-weight: normal;
       }
     }
     .sale-list {
-      .margin(0, 30);
+      background: @white;
+      .padding(0, 30);
       .bordertop(1, solid, #e5e5e5);
       display: flex;
       flex-wrap: wrap;
@@ -543,7 +554,7 @@
         }
         p {
           .font-line(26, 39);
-          color: #020202;
+          color: #444;
           text-align: center;
           .mtop(20);
         }

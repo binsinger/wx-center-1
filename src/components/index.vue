@@ -35,31 +35,31 @@
           <div class="sign-date">
             <div class="sign-date-inner" id="sign-date-inner">
               <div class="date-box" v-for="sign in signArray">
-                <div class="date date-before-sign-in" v-if="sign.type ==='before' && sign.signTag ===1">
+                <div class="date date-before-sign-in" ref="abc" v-if="sign.type ==='before' && sign.signTag ===1">
                   <i :style="{'background-color':word}">
                     <em class="left" :style="{'background-color':word}"></em>
                     <em class="right" :style="{'background-color':word}"></em>
                   </i>
                   {{sign.num}}
                 </div>
-                <div class="date date-before-sign" v-if="sign.type==='before' && sign.signTag ===0"
+                <div class="date date-before-sign" ref="abc" v-if="sign.type==='before' && sign.signTag ===0"
                      :style="{'color':word}">
                   <i :style="{'border-color':word}"><em
                     class="left"></em><em class="right"></em></i>
                   {{sign.num}}
                 </div>
-                <div class="date date-on-sign" v-if="sign.type==='day' && signstate.todaySign ===0">
+                <div class="date date-on-sign" ref="abc" v-if="sign.type==='day' && signstate.todaySign ===0">
                   <i
                     :style="{'border-color':word}"><em class="left"></em><em
                     class="right"></em></i>今日
                 </div>
-                <div class="date date-on-sign-in" v-if="sign.type==='day' && signstate.todaySign ===1"
+                <div class="date date-on-sign-in" ref="abc" v-if="sign.type==='day' && signstate.todaySign ===1"
                      :style="{'color':word}">
                   <i :style="{'background-color':word,}">
                     <em class="left" :style="{'background-color':word}"></em>
                     <em class="right" :style="{'background-color':word}"></em></i>今日
                 </div>
-                <div class="date date-after-sign" v-if="sign.type==='after'"><i><em class="left"></em><em
+                <div class="date date-after-sign" ref="abc" v-if="sign.type==='after'"><i><em class="left"></em><em
                   class="right"></em></i>{{sign.num}}
                 </div>
               </div>
@@ -139,7 +139,8 @@
     </div>
     <div class="sale" v-if="shop.show">
       <h5><i :style="{'background-color':word}"></i>
-        {{shop.name}}
+        <!--{{shop.name}}-->
+        积分商城
         <a :href="shop.link" v-if="shop.link !== ''" class="theme-color theme-border-color"
            :style="{'color':word,'border-color':word}">前往商城</a>
         <a href="javascript:void(0);" v-if="shop.link == ''" class="theme-color theme-border-color"
@@ -240,9 +241,15 @@
     created() {
       this.url = window.location.origin
       this.mpid = this.init("mpid")
+      this.mpid = 18
       this.load();
       this.timeFun();
       this.setInt = setInterval(this.scroll, 3000);
+    },
+    mounted(){
+//      console.log(this.$refs.abc.offsetWidth)
+//      console.log(this.$refs.abc.getBoundingClientRect().height)
+      console.log($(".date"))
     },
     methods: {
       init(name) {
@@ -255,8 +262,8 @@
       load() {
         this.$http({
           method: 'get',
-          url: this.url+'/center/wap/center/set',
-//          url: 'api/center/wap/center/set',
+//          url: this.url+'/center/wap/center/set',
+          url: 'api/center/wap/center/set',
           params: {
             mpid: this.mpid
           }
@@ -350,6 +357,11 @@
               clearInterval(this.setInt)
             }
             this.signRule();
+
+            if(!this.signstate.todaySign){
+//              console.log($(".date").offsetHeight)
+              this.signBtn()
+            }
           }
         }).catch((result) => {
         })
@@ -405,8 +417,8 @@
       signRule(){
         this.$http({
           method: 'get',
-          url:this.signstate.ruleLink,
-//          url: 'api/center/wap/rule/sign.html',
+//          url:this.signstate.ruleLink,
+          url: 'api/center/wap/rule/sign.html',
           params: {
             mpid: this.mpid
           }

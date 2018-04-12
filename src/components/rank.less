@@ -1,0 +1,70 @@
+@import '../less/utils';
+
+.rank-wrap{
+  .inner{
+    .info{
+      display: flex;
+      .padding(40,30,50,30);
+      background: @white;
+      p{
+        color:#444;
+        display: flex;
+        align-items: flex-end;
+        em{
+          font-style: normal;
+        }
+      }
+      .info-s{
+        em{
+          .font-line(24,24);
+        }
+        span{
+          .font-line(30,24);
+          color:#ff5a00;
+          .mleft(5);
+          .mright(5);
+        }
+      }
+      .info-l{
+        em{
+          .font-line(26,26);
+        }
+        span{
+          .font-line(48,40);
+          color:#ff5a00;
+          .mleft(5);
+          .mright(5);
+        }
+      }
+    }
+    .rank-list{
+      .mtop(17);
+      background: @white;
+      h5{
+        .font-line(26,26);
+        color:#ff8a00;
+        text-align: center;
+        .padding(30,0);
+        font-weight: normal;
+      }
+      ul{
+        li{
+          .bordertop(1,solid,#e5e5e5);
+          .padding(30,0);
+          .margin(0,30);
+          display: flex;
+          justify-content: space-between;
+          p{
+            .font-line(26,26);
+            color:#313131;
+          }
+          span{
+            .font-line(26,26);
+            color:#ff5a00;
+          }
+        }
+      }
+    }
+  }
+}
+

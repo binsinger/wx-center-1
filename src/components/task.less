@@ -1,0 +1,48 @@
+@import '../less/utils';
+
+.task-wrap{
+  .inner{
+    .task-list{
+      .mtop(20);
+      background: @white;
+      ul{
+        li{
+          .borderbottom(1,solid,#e5e5e5);
+          .padding(30,0);
+          .margin(0,30);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          &:after{
+            content:"";
+            .wh(18,29);
+            background: url('../assets/images/icon-arrow.png') no-repeat center right;
+            background-size:auto 100%;
+          }
+          a{
+            flex:1;
+          }
+          p{
+            .font-line(26,26);
+            color:#313131;
+            .mbottom(14);
+          }
+          span{
+            .font-line(24,24);
+            color:#7d7d7d;
+          }
+          .havepart{
+            color:#898989;
+            .font-line(24,24);
+            .mright(10);
+            .mleft(10);
+          }
+        }
+        li:last-child{
+          border:none;
+        }
+      }
+    }
+  }
+}
+

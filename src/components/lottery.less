@@ -1,0 +1,76 @@
+@import '../less/utils';
+
+.lottery-wrap {
+  .inner {
+    .nav-list {
+      background: @white;
+      .margin(8, 0);
+      display: flex;
+      li {
+        flex: 1;
+        text-align: center;
+        p {
+          .font-line(26, 26);
+          color: #444;
+          display: inline-block;
+          .padding(30, 0);
+        }
+        
+      }
+      .active {
+        p {
+          position: relative;
+          &:after {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            .height(2);
+            background: #ff5a00;
+          }
+        }
+      }
+    }
+    .lottery-list{
+      .margin(35,0);
+      background: @white;
+      .padding(0,30,150);
+      .lottery-link{
+        .padding(30,0);
+        display: flex;
+        justify-content: space-between;
+        .borderbottom(1,solid,#e5e5e5);
+        .lottery-l{
+          p{
+            .font-line(26,26);
+            color:#313131;
+            .mbottom(20);
+          }
+          span{
+            .font-line(24,24);
+            color:#7d7d7d;
+          }
+        }
+        .lottery-r{
+          p{
+            .font-line(26,26);
+            color:#ff5a00;
+            .mbottom(20);
+          }
+          span{
+            .font-line(24,24)
+          }
+          .aly{
+            color:#7d7d7d;
+          }
+          .not{
+            color:#313131;
+          }
+        }
+      }
+    }
+  }
+}
+

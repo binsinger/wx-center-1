@@ -1,0 +1,95 @@
+@import '../less/utils';
+
+.integral-wrap{
+  .inner{
+    .integral-bk{
+      .mtop(20);
+      background: @white;
+      .padding(30,0);
+      display: flex;
+      .integral-item{
+        flex:1;
+        text-align: center;
+        .borderright(1,solid,#e5e5e5);
+        p{
+          color:#444;
+          .font-line(26,26);
+          text-align: center;
+          .mbottom(20);
+        }
+        span{
+          .font-line(30,30);
+        }
+        span.text-orange{
+          color:#ff8a00;
+        }
+        span.text-red{
+          color:#ff0c00;
+        }
+        span.text-green{
+          color:#34ba6d;
+        }
+      }
+      .integral-item:last-child{
+        border:none
+      }
+    }
+    .integral-cont{
+      display: flex;
+      justify-content: space-between;
+      .padding(30);
+      .income{
+        .font-line(24,24);
+        color:#444;
+        span{
+          .font-line(24,24);
+        }
+      }
+      .strategy{
+        .font-line(24,24);
+        color:#595858;
+      }
+    }
+    .integral-list{
+      background: @white;
+      ul{
+        li{
+          .borderbottom(1,solid,#e5e5e5);
+          .padding(30,0);
+          .margin(0,30);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          &:after{
+            content:"";
+            .wh(18,29);
+            background: url('../assets/images/icon-arrow.png') no-repeat center right;
+            background-size:auto 100%;
+          }
+          a{
+            flex:1;
+          }
+          p{
+            .font-line(26,26);
+            color:#313131;
+            .mbottom(14);
+          }
+          span{
+            .font-line(24,24);
+            color:#7d7d7d;
+          }
+          .havepart{
+            color:#898989;
+            .font-line(24,24);
+            .mright(10);
+            .mleft(10);
+          }
+        }
+        li:last-child{
+          border:none;
+        }
+      }
+    }
+  }
+}
+
