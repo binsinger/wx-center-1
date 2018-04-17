@@ -35,38 +35,38 @@
           <div class="sign-date">
             <div class="sign-date-inner" id="sign-date-inner">
               <div class="date-box" v-for="sign in signArray">
-                <div class="date date-before-sign-in" ref="abc" v-if="sign.type ==='before' && sign.signTag ===1">
+                <div class="date date-before-sign-in" v-if="sign.type ==='before' && sign.signTag ===1">
                   <i :style="{'background-color':word}">
                     <em class="left" :style="{'background-color':word}"></em>
                     <em class="right" :style="{'background-color':word}"></em>
                   </i>
                   {{sign.num}}
                 </div>
-                <div class="date date-before-sign" ref="abc" v-if="sign.type==='before' && sign.signTag ===0"
+                <div class="date date-before-sign" v-if="sign.type==='before' && sign.signTag ===0"
                      :style="{'color':word}">
                   <i :style="{'border-color':word}"><em
                     class="left"></em><em class="right"></em></i>
                   {{sign.num}}
                 </div>
-                <div class="date date-on-sign" ref="abc" v-if="sign.type==='day' && signstate.todaySign ===0">
+                <div class="date date-on-sign" v-if="sign.type==='day' && signstate.todaySign ===0">
                   <i
                     :style="{'border-color':word}"><em class="left"></em><em
                     class="right"></em></i>今日
                 </div>
-                <div class="date date-on-sign-in" ref="abc" v-if="sign.type==='day' && signstate.todaySign ===1"
+                <div class="date date-on-sign-in" v-if="sign.type==='day' && signstate.todaySign ===1"
                      :style="{'color':word}">
                   <i :style="{'background-color':word,}">
                     <em class="left" :style="{'background-color':word}"></em>
                     <em class="right" :style="{'background-color':word}"></em></i>今日
                 </div>
-                <div class="date date-after-sign" ref="abc" v-if="sign.type==='after'"><i><em class="left"></em><em
+                <div class="date date-after-sign" v-if="sign.type==='after'"><i><em class="left"></em><em
                   class="right"></em></i>{{sign.num}}
                 </div>
               </div>
             </div>
           </div>
           <div class="btn-sign-up" @click="show = !show">
-            <p>收起签到卡</p>
+            <p>点击收起</p>
           </div>
         </div>
       </transition>
@@ -142,15 +142,15 @@
         <!--{{shop.name}}-->
         积分商城
         <a :href="shop.link" v-if="shop.link !== ''" class="theme-color theme-border-color"
-           :style="{'color':word,'border-color':word}">前往商城</a>
+           :style="{'color':word,'border-color':word}">更多商品</a>
         <a href="javascript:void(0);" v-if="shop.link == ''" class="theme-color theme-border-color"
-           :style="{'color':word,'border-color':word}">前往商城</a>
+           :style="{'color':word,'border-color':word}">更多商品</a>
       </h5>
       <div class="sale-list">
         <a div class="sale-link" v-for="sale in shopList" :href="sale.detial_url">
           <img :src="sale.picurl"/>
           <p>{{sale.name}}</p>
-          <span class="theme-color" :style="{'color':word}">{{sale.need_score}}积分+{{sale.need_money}}元</span>
+          <span class="theme-color" :style="{'color':word}">{{sale.need_score}}{{unitStr}}+{{sale.need_money}}元</span>
         </a>
       </div>
     </div>
@@ -160,9 +160,11 @@
       <div class="rule-modal-inner">
         <h5 :style="{'color':word}">签到规则</h5>
         <p>每天签到可获得<span :style="{'color':word}">{{ruleBase}}</span>奖励</p>
-        <p v-for="rslist in ruleScoreList">连续<span :style="{'color':word}">{{rslist[0]}}</span>天签到后，每天额外奖励<span :style="{'color':word}">{{rslist[1]}}</span>奖励说明</p>
+        <p v-for="rslist in ruleScoreList">连续<span :style="{'color':word}">{{rslist[0]}}</span>天签到后，每天额外奖励<span
+          :style="{'color':word}">{{rslist[1]}}</span>奖励说明</p>
         <p>每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>奖励</p>
-        <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure" @click="signRuleShow = !signRuleShow">确定</a>
+        <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure"
+           @click="signRuleShow = !signRuleShow">确定</a>
       </div>
     </div>
 
@@ -170,6 +172,19 @@
     <div class="sign-modal-box" v-show="signModalShow">
       <div class="sign-modal-inner">
         <p v-html="signModalTitle">{{signModalTitle}}</p>
+      </div>
+    </div>
+
+    <!--attract-->
+    <div class="share-modal-box" v-show="shareModalShow">
+      <div class="share-modal-inner">
+        <div class="title">
+          <img src="/wap/center/static/img/subscribe-box.png"/>
+        </div>
+        <div class="qrcode-box">
+          <img :src="mpQrcode"/>
+        </div>
+        <p>长按二维码加关注</p>
       </div>
     </div>
   </div>
@@ -201,7 +216,7 @@
         taskName: "",
         taskInvite: {
           link: "",
-          rule: "",
+          rule: [],
           show: false
         },
         module: [],
@@ -215,7 +230,7 @@
           link: "",
           show: false
         },
-        shopList: {},
+        shopList: [],
         signstate: {
           signUrl: "",
           ruleLink: "",
@@ -230,40 +245,45 @@
         signModalTitle: "",
         signModalLock: true,
         signModalShow: false,
-        ruleScoreList:[],
-        ruleBase:0,
-        ruleFull:0,
-        signRuleShow:false,
-        signChange:0,
+        ruleScoreList: [],
+        ruleBase: 0,
+        ruleFull: 0,
+        signRuleShow: false,
+        signChange: 0,
         sinsetInt: "",
+        shareModalShow: false,
+        mpQrcode: "",
+        shareList:{},
+        unitStr:''
       }
     },
     created() {
       this.url = window.location.origin
       this.mpid = this.init("mpid")
-      this.mpid = 18
+
       this.load();
       this.timeFun();
       this.setInt = setInterval(this.scroll, 3000);
     },
-    mounted(){
-//      console.log(this.$refs.abc.offsetWidth)
-//      console.log(this.$refs.abc.getBoundingClientRect().height)
-      console.log($(".date"))
+    mounted() {
     },
     methods: {
+      /**
+       * 获取地址栏参数
+       */
       init(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
         if (r != null) return unescape(r[2]);
         return null;
       },
-      //页面初始化
+      /**
+       * 页面初始化
+       */
       load() {
         this.$http({
           method: 'get',
-//          url: this.url+'/center/wap/center/set',
-          url: 'api/center/wap/center/set',
+          url: this.url+'/center/wap/center/set',
           params: {
             mpid: this.mpid
           }
@@ -278,13 +298,17 @@
                 this.word = userReault[i].color
               }
               if (userReault[i].class == 'Score') {
-                this.score.scoreNum = userReault[i].score
+                this.score.scoreNum = this.formatInt(userReault[i].score)
                 this.score.scoreLink = userReault[i].link
                 this.score.mpname = userReault[i].mpname
               }
               if (userReault[i].class == 'Notice') {
                 this.noticeList = userReault[i].list
-                this.notice.show = true
+                if(userReault[i].list.length>0){
+                  this.notice.show = true;
+                }else{
+                  clearInterval(this.setInt)
+                }
                 this.notice.name = userReault[i].name
               }
               if (userReault[i].class == 'Ad') {
@@ -307,6 +331,9 @@
                 this.userInfo.nickname = userReault[i].nickname
                 this.userInfo.headimgurl = userReault[i].headimgurl
                 this.userInfo.link = userReault[i].link
+                if (userReault[i].subscribe == 0) {
+                  this.shareModalShow = true
+                }
               }
               if (userReault[i].class == 'Shop') {
                 this.shop.show = true
@@ -315,15 +342,15 @@
                 this.shopList = userReault[i].list
               }
               if (userReault[i].class == 'Sign') {
-                this.signstate.signUrl = userReault[i].sign_url
-                this.signstate.ruleLink = userReault[i].rule_link
-                this.signstate.todaySign = userReault[i].is_today_sign
+                this.signstate.signUrl = userReault[i].sign_url;
+                this.signstate.ruleLink = userReault[i].rule_link;
+                this.signstate.todaySign = userReault[i].is_today_sign;
 
-                this.signstate.days = userReault[i].days
-                this.signList = userReault[i].log
+                this.signstate.days = userReault[i].days;
+                this.signList = userReault[i].log;
 
                 let signListArray = [];
-                for (i in this.signList) {
+                for (let i in this.signList) {
                   signListArray.push(this.signList[i])
                 }
                 let dayNum = 0;
@@ -352,30 +379,65 @@
                   })
                 }
               }
+              if (userReault[i].class == 'Mp') {
+                this.mpQrcode = userReault[i].mpqrcode
+              }
+              if(userReault[i].class == 'Share'){
+                this.shareList.title = userReault[i].title;
+                this.shareList.desc = userReault[i].desc;
+                this.shareList.share_link = userReault[i].share_link;
+                this.shareList.imgurl = userReault[i].imgurl;
+                this.shareList.domain = userReault[i].domain;
+                this.shareList.mpid = userReault[i].mpid;
+              }
+              if(userReault[i].class == 'Special'){
+                this.unitStr = userReault[i].score_name
+              }
             }
+
+            //通知轮播停止
             if (this.noticeList.length < 2) {
               clearInterval(this.setInt)
             }
+
+            //触发签到规则方法
             this.signRule();
 
-            if(!this.signstate.todaySign){
-//              console.log($(".date").offsetHeight)
-              this.signBtn()
+            //今日未签到，默认显示签到浮层
+            if (!this.signstate.todaySign) {
+              this.signBtn();
             }
+
+            this.$nextTick(() => {
+              //签到日期，当前日期在可视区域内
+              this.signScroll();
+              //页面数据初始化后，调用分享
+              this.shareFun();
+            });
           }
         }).catch((result) => {
         })
       },
-      //notice 滚动
+      /**
+       * 通知轮播效果
+       */
       scroll() {
-        this.animate = true;
-        setTimeout(() => {
-          this.noticeList.push(this.noticeList[0]);
-          this.noticeList.shift();
-          this.animate = false;
-        }, 1000)
+        var self = this;
+        self.animate = true;
+        if(self.noticeList.length>0){
+          setTimeout(() => {
+            self.noticeList.push(self.noticeList[0]);
+            self.noticeList.shift();
+            self.animate = false;
+          }, 1000)
+        }else{
+          clearInterval(self.setInt)
+        }
+
       },
-      //签到按钮
+      /**
+       * 触发签到按钮
+       */
       signFun() {
         if (!this.signModalLock) {
           return false
@@ -383,7 +445,7 @@
         this.signModalLock = !this.signModalLock;
         this.$http({
           method: 'get',
-          url:this.signstate.signUrl,
+          url: this.signstate.signUrl,
 //          url: 'api/user/wap/sign/sign.html',
           params: {
             mpid: this.mpid
@@ -393,7 +455,8 @@
             this.signstate.todaySign = 1;
             this.signstate.days++;
             this.signChange = result.data.data.change
-            this.signModalTitle = '签到成功，恭喜您获得<span style="color:'+this.word+'">'+this.signChange+'</span>积分奖励'
+            this.signModalTitle = '签到成功，恭喜您获得<span style="color:' + this.word + '">' + this.signChange + '</span>' + this.unitStr +'奖励'
+            this.score.scoreNum  = Number(this.score.scoreNum) + Number(this.signChange);
           } else if (result.data.e == '2951') {
             this.signModalTitle = result.data.m
           }
@@ -402,36 +465,45 @@
         }).catch((result) => {
         })
       },
-      //签到完成提示浮层5s后隐藏
-      signModalHide(){
+      /**
+       * 签到完成提示浮层5s后隐藏
+       */
+      signModalHide() {
         var that = this;
-         setTimeout(function(){
-           that.signModalShow = false;
-           that.signModalLock = !that.signModalLock;
-         },3000)
+        setTimeout(function () {
+          that.signModalShow = false;
+          that.signModalLock = !that.signModalLock;
+        }, 3000)
       },
-      //签到规则
-      signRuleFun(){
+      /**
+       * 签到规则弹窗显示
+       */
+      signRuleFun() {
         this.signRuleShow = true
       },
-      signRule(){
+      /**
+       * 签到规则数据
+       */
+      signRule() {
         this.$http({
           method: 'get',
-//          url:this.signstate.ruleLink,
-          url: 'api/center/wap/rule/sign.html',
+          url:this.signstate.ruleLink,
+//          url: 'api/center/wap/rule/sign.html',
           params: {
             mpid: this.mpid
           }
         }).then((result) => {
           if (result.data.e == '9999') {
-              this.ruleScoreList = result.data.data.attach
-              this.ruleBase = result.data.data.base
-              this.ruleFull = result.data.data.full
+            this.ruleScoreList = result.data.data.attach
+            this.ruleBase = result.data.data.base
+            this.ruleFull = result.data.data.full
           }
         }).catch((result) => {
         })
       },
-      //日期年月
+      /**
+       * 日期、年月
+       */
       timeFun() {
         let year = new Date().getFullYear();
         let leap = 28;
@@ -441,21 +513,52 @@
         this.day = new Date().getDate();
         this.monthNum = monthDays[new Date().getMonth()]
       },
-      //平年 闰年
+      /**
+       * 平年 闰年
+       */
       isLeapYear(year) {
         return (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0);
       },
-      //点击展开签到浮层
+      /**
+       * 触发显示签到浮层
+      */
       signBtn() {
         this.show = !this.show
         this.signScroll()
       },
-      //打开签到浮层，今日需要默认在当前屏
+      /**
+       * 显示签到浮层，今日需要默认在当前屏
+       */
       signScroll() {
         let w = $(".date").width();
         if (this.day > 5) {
           $('.sign-date-inner').animate({scrollLeft: (this.day - 5) * w}, 100);
         }
+      },
+      /**
+       * 分享方法
+       */
+      shareFun() {
+        var sdkInstance = new jssdk(this.shareList.mpid, this.shareList.domain);
+        sdkInstance.share(this.shareList.title, this.shareList.desc, this.shareList.imgurl, this.shareList.title, '', this.shareList.share_link);
+      },
+      /**
+       * 千位符
+       */
+      formatInt: function (num) {
+        num = num + '';//数字转字符串
+        var str = "";//字符串累加
+        var counter = 0;
+        for (var i = num.length - 1; i >= 0; i--) {
+          counter++;
+          if (counter % 3 == 0 && i != 0) {//每隔三位加逗号，过滤正好在第一个数字的情况
+            str += num[i] + ",";//加千分位逗号
+            continue;
+          }
+
+          str += num[i];//倒着累加数字
+        }
+        return str.split('').reverse().join("");//字符串=>数组=>反转=>字符串
       }
     }
   }

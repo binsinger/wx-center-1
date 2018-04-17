@@ -3,7 +3,8 @@
 import Vue from 'vue'
 import router from './router'
 import axios from 'axios'
-import $ from 'jquery'
+// import $ from 'jquery'
+// import wx from 'weixin-js-sdk'
 
 Vue.prototype.$http= axios
 
