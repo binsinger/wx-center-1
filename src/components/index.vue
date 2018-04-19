@@ -89,7 +89,7 @@
     </div>
     <div class="integral">
       <div class="integral-user">
-        <p>您在<a href="javascript:void(0);" class="theme-color" :style="{'color':word}">“{{score.mpname}}”</a>的积分</p>
+        <p>您在<a href="javascript:void(0);" class="theme-color" :style="{'color':word}">“{{score.mpname}}”</a>的{{unitStr}}</p>
         <a :href="score.scoreLink" class="theme-color integral-num" :style="{'color':word}">
           {{score.scoreNum}}
           <i class="theme-bg-color" :style="{'background-color':word}">
@@ -159,10 +159,10 @@
     <div class="rule-modal-box" v-show="signRuleShow">
       <div class="rule-modal-inner">
         <h5 :style="{'color':word}">签到规则</h5>
-        <p>每天签到可获得<span :style="{'color':word}">{{ruleBase}}</span>奖励</p>
+        <p>每天签到可获得<span :style="{'color':word}">{{ruleBase}}</span>{{unitStr}}</p>
         <p v-for="rslist in ruleScoreList">连续<span :style="{'color':word}">{{rslist[0]}}</span>天签到后，每天额外奖励<span
-          :style="{'color':word}">{{rslist[1]}}</span>奖励说明</p>
-        <p>每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>奖励</p>
+          :style="{'color':word}">{{rslist[1]}}</span>{{unitStr}}</p>
+        <p>每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>{{unitStr}}</p>
         <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure"
            @click="signRuleShow = !signRuleShow">确定</a>
       </div>
@@ -187,6 +187,7 @@
         <p>长按二维码加关注</p>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -203,6 +204,7 @@
         header: "",
         word: "",
         score: {
+          baseNum:"",
           scoreNum: "",
           scoreLink: "",
           mpname: ""
@@ -261,6 +263,8 @@
       this.url = window.location.origin
       this.mpid = this.init("mpid")
 
+//      this.mpid = 18
+
       this.load();
       this.timeFun();
       this.setInt = setInterval(this.scroll, 3000);
@@ -284,6 +288,7 @@
         this.$http({
           method: 'get',
           url: this.url+'/center/wap/center/set',
+//          url: 'api/center/wap/center/set.html',
           params: {
             mpid: this.mpid
           }
@@ -298,17 +303,18 @@
                 this.word = userReault[i].color
               }
               if (userReault[i].class == 'Score') {
-                this.score.scoreNum = this.formatInt(userReault[i].score)
+                this.score.baseNum = userReault[i].score;
+                this.score.scoreNum = this.formatInt(userReault[i].score);
                 this.score.scoreLink = userReault[i].link
                 this.score.mpname = userReault[i].mpname
               }
               if (userReault[i].class == 'Notice') {
-                this.noticeList = userReault[i].list
-                if(userReault[i].list.length>0){
-                  this.notice.show = true;
-                }else{
-                  clearInterval(this.setInt)
-                }
+                  this.noticeList = userReault[i].list ? userReault[i].list : []
+                  if(this.noticeList.length>0){
+                    this.notice.show = true;
+                  }else{
+                    clearInterval(this.setInt)
+                  }
                 this.notice.name = userReault[i].name
               }
               if (userReault[i].class == 'Ad') {
@@ -400,9 +406,6 @@
               clearInterval(this.setInt)
             }
 
-            //触发签到规则方法
-            this.signRule();
-
             //今日未签到，默认显示签到浮层
             if (!this.signstate.todaySign) {
               this.signBtn();
@@ -456,7 +459,11 @@
             this.signstate.days++;
             this.signChange = result.data.data.change
             this.signModalTitle = '签到成功，恭喜您获得<span style="color:' + this.word + '">' + this.signChange + '</span>' + this.unitStr +'奖励'
-            this.score.scoreNum  = Number(this.score.scoreNum) + Number(this.signChange);
+
+            this.signChange = this.signChange ? this.signChange : 0;
+            var totalNum = Number(this.score.baseNum) + Number(this.signChange);
+            this.score.scoreNum  = this.formatInt(totalNum);
+
           } else if (result.data.e == '2951') {
             this.signModalTitle = result.data.m
           }
@@ -479,7 +486,8 @@
        * 签到规则弹窗显示
        */
       signRuleFun() {
-        this.signRuleShow = true
+        //触发签到规则方法
+        this.signRule();
       },
       /**
        * 签到规则数据
@@ -497,6 +505,7 @@
             this.ruleScoreList = result.data.data.attach
             this.ruleBase = result.data.data.base
             this.ruleFull = result.data.data.full
+            this.signRuleShow = true
           }
         }).catch((result) => {
         })

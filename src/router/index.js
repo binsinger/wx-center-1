@@ -8,6 +8,7 @@ import Rank from '../components/rank'
 import Lottery from '../components/lottery'
 import Task from '../components/task'
 import Integral from '../components/integral'
+import Bindsuccess from '../components/bindsuccess'
 
 Vue.use(Router)
 
@@ -46,6 +47,10 @@ export default new Router({
         {
           path:'integral',
           component:Integral
+        },
+        {
+          path:'bindsuccess',
+          component:Bindsuccess
         }
       ]
     }

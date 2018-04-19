@@ -53,24 +53,6 @@
       </div>
     </div>
 
-    <router-link to="./invite">
-      <div style="font-size:20px;color:#000">邀请好友</div>
-    </router-link>
-    <router-link to="./phonebind">
-      <div style="font-size:20px;color:#000">手机绑定</div>
-    </router-link>
-    <router-link to="./rank">
-      <div style="font-size:20px;color:#000">我的排名</div>
-    </router-link>
-    <router-link to="./lottery">
-      <div style="font-size:20px;color:#000">我的中奖</div>
-    </router-link>
-    <router-link to="./task">
-      <div style="font-size:20px;color:#000">我的任务</div>
-    </router-link>
-    <router-link to="./integral">
-      <div style="font-size:20px;color:#000">我的积分</div>
-    </router-link>
   </div>
 </template>
 
