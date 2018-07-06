@@ -2,27 +2,27 @@
   <div class="index-wrap">
     <div class="head">
       <img :src="header"/>
-      <a :href="userInfo.link" class="head-inner">
+      <div class="head-inner">
         <div class="user-photo">
           <img :src="userInfo.headimgurl"/>
         </div>
         <div class="user-name">
-          <p>{{userInfo.nickname}}</p>
-          <span></span>
+          <a :href="detailUrl" :class="{'tz':detailshow}">{{userInfo.nickname}}</a>
+          <a :href="bindphoneUrl" class="userphonetz" v-if="!isBind && isPhone">立即绑定手机获取更多福利...</a>
         </div>
-      </a>
+      </div>
       <div class="btn-sign-down theme-bg-color" :style="{'background-color':word}" @click="signBtn">
         <p class="theme-bg-color" :style="{'background-color':word}">签到有礼<img src="../assets/images/icon-1.png"/></p>
       </div>
       <transition name="down">
-        <div class="sign-box" v-show="show">
+        <div class="sign-box" v-show="show" style="background:#f00">
           <div class="sign-drop">
             <img src="/wap/center/static/img/head-bg.jpg"/>
             <div class="sign-inner">
               <div class="sign-text" v-if="signstate.todaySign===0" @click="signFun">
                 <p class="theme-color" :style="{'color':word}">签到</p>
               </div>
-              <div class="sign-success" v-if="signstate.todaySign===1" @click="signFun">
+              <div class="sign-success" v-if="signstate.todaySign===1" @click="resignFun">
                 <span class="theme-color" :style="{'color':word}">已连续签到</span>
                 <p class="theme-color" :style="{'color':word}">{{signstate.days}}天</p>
               </div>
@@ -32,7 +32,7 @@
               </div>
             </div>
           </div>
-          <div class="sign-date">
+          <div class="sign-date"  @click="resignFun">
             <div class="sign-date-inner" id="sign-date-inner">
               <div class="date-box" v-for="sign in signArray">
                 <div class="date date-before-sign-in" v-if="sign.type ==='before' && sign.signTag ===1">
@@ -42,8 +42,8 @@
                   </i>
                   {{sign.num}}
                 </div>
-                <div class="date date-before-sign" v-if="sign.type==='before' && sign.signTag ===0"
-                     :style="{'color':word}">
+                <div class="date date-before-sign" @click="resignFun" v-if="sign.type==='before' && sign.signTag ===0"
+                     :style="{'color':word}" >
                   <i :style="{'border-color':word}"><em
                     class="left"></em><em class="right"></em></i>
                   {{sign.num}}
@@ -131,7 +131,7 @@
     </div>
     <div class="active-item" v-for="ad in adList" :key="ad.id">
       <a :href="ad.link" v-if="ad.link !== ''">
-        <img :src="ad.img"/>
+        <img :src="ad.img" v-bind:style="{'height':adheight +'px'}"/>
       </a>
       <a href="javascript:void(0);" v-if="ad.link == ''">
         <img :src="ad.img"/>
@@ -159,10 +159,11 @@
     <div class="rule-modal-box" v-show="signRuleShow">
       <div class="rule-modal-inner">
         <h5 :style="{'color':word}">签到规则</h5>
-        <p>每天签到可获得<span :style="{'color':word}">{{ruleBase}}</span>{{unitStr}}</p>
-        <p v-for="rslist in ruleScoreList">连续<span :style="{'color':word}">{{rslist[0]}}</span>天签到后，每天额外奖励<span
+        <p v-if="ruleBase">每天签到可获得<span :style="{'color':word}">{{ruleBase}}</span>{{unitStr}}</p>
+        <p v-if="ruleScoreList" v-for="rslist in ruleScoreList">连续<span :style="{'color':word}">{{rslist[0]}}</span>天签到后，每天额外奖励<span
           :style="{'color':word}">{{rslist[1]}}</span>{{unitStr}}</p>
-        <p>每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>{{unitStr}}</p>
+        <p v-if="ruleFull">每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>{{unitStr}}</p>
+        <p v-if="randscore">每天签到可获得<span :style="{'color':word}">{{randscore.min}}</span>到<span :style="{'color':word}">{{randscore.max}}</span>之间随机{{unitStr}}</p>
         <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure"
            @click="signRuleShow = !signRuleShow">确定</a>
       </div>
@@ -176,7 +177,7 @@
     </div>
 
     <!--attract-->
-    <div class="share-modal-box" v-show="shareModalShow">
+    <div class="share-modal-box" v-show="false && shareModalShow">
       <div class="share-modal-inner">
         <div class="title">
           <img src="/wap/center/static/img/subscribe-box.png"/>
@@ -250,24 +251,33 @@
         ruleScoreList: [],
         ruleBase: 0,
         ruleFull: 0,
+        randscore:{},
         signRuleShow: false,
         signChange: 0,
         sinsetInt: "",
         shareModalShow: false,
         mpQrcode: "",
         shareList:{},
-        unitStr:''
+        unitStr:'',
+        adheight:'',//广告图片高度
+        detailUrl:'##',//个人资料页面跳转
+        bindphoneUrl:'',//绑定手机页面跳转
+        detailshow:false,//个人资料是否跳转
+        isBind:false,//手机号是否验证过
+        isPhone:false,//后台权限
       }
     },
     created() {
       this.url = window.location.origin
       this.mpid = this.init("mpid")
 
-//      this.mpid = 18
+      this.mpid = 18
 
       this.load();
       this.timeFun();
       this.setInt = setInterval(this.scroll, 3000);
+
+      this.isBindPhone();
     },
     mounted() {
     },
@@ -287,14 +297,15 @@
       load() {
         this.$http({
           method: 'get',
-          url: this.url+'/center/wap/center/set',
-//          url: 'api/center/wap/center/set.html',
+          // url: this.url+'/center/wap/center/set',
+          url: 'api/center/wap/center/set.html',
           params: {
             mpid: this.mpid
           }
         }).then((result) => {
           if (result.data.e == '9999') {
             var userReault = result.data.data;
+            this.module = [];
             for (let i in userReault) {
               if (userReault[i].class == 'Header') {
                 this.header = userReault[i].img
@@ -355,9 +366,14 @@
                 this.signstate.days = userReault[i].days;
                 this.signList = userReault[i].log;
 
+                let limit = userReault[i].resignLimitNum;
                 let signListArray = [];
                 for (let i in this.signList) {
-                  signListArray.push(this.signList[i])
+                  // signListArray.push(this.signList[i])
+                  signListArray.push({
+                    tag: this.signList[i],
+                    date: i
+                  })
                 }
                 let dayNum = 0;
                 for (let x = 0; x < signListArray.length; x++) {
@@ -365,14 +381,17 @@
                   if (dayNum == this.day) {
                     this.signArray.push({
                       num: `${this.month}.${dayNum}`,
-                      signTag: signListArray[x],
-                      type: "day"
+                      signTag: signListArray[x].tag,
+                      date: signListArray[x].date,
+                      type: "day",
                     })
                   } else {
                     this.signArray.push({
                       num: `${this.month}.${dayNum}`,
-                      signTag: signListArray[x],
-                      type: "before"
+                      signTag: signListArray[x].tag,
+                      date: signListArray[x].date,
+                      type: "before",
+                      canSign: signListArray[x].tag === 0 &&  this.day - dayNum <= limit
                     })
                   }
                 }
@@ -399,6 +418,14 @@
               if(userReault[i].class == 'Special'){
                 this.unitStr = userReault[i].score_name
               }
+              if(userReault[i].class == 'Detail'){
+                this.detailUrl = userReault[i].link
+                this.detailshow = true;
+              }
+              if(userReault[i].class == 'Bindphone'){
+                this.bindphoneUrl = userReault[i].link
+                this.isPhone = true
+              }
             }
 
             //通知轮播停止
@@ -416,6 +443,8 @@
               this.signScroll();
               //页面数据初始化后，调用分享
               this.shareFun();
+
+              this.adheight = $(".active-item").width() * 5 / 12;
             });
           }
         }).catch((result) => {
@@ -451,7 +480,7 @@
           url: this.signstate.signUrl,
 //          url: 'api/user/wap/sign/sign.html',
           params: {
-            mpid: this.mpid
+            // mpid: this.mpid
           }
         }).then((result) => {
           if (result.data.e == '9999') {
@@ -464,6 +493,9 @@
             var totalNum = Number(this.score.baseNum) + Number(this.signChange);
             this.score.scoreNum  = this.formatInt(totalNum);
 
+            //刷新数据
+            this.load();
+
           } else if (result.data.e == '2951') {
             this.signModalTitle = result.data.m
           }
@@ -472,6 +504,28 @@
         }).catch((result) => {
         })
       },
+      /**
+       * 补签的英文是什么
+       */
+      resignFun() {
+        console.log(1);
+        if(!sign.canSign) return;
+        if (!this.signModalLock) {
+          return false
+        }
+        this.$http({
+          method: 'get',
+          // url: this.signstate.signUrl,
+          url: 'api/user/wap/sign/re-sign?mpid=18',
+          params: {
+            // mpid: this.mpid
+            resignDate: sign.date
+          }
+        }).then((result) => {
+          console.log(result);
+        }).catch(result => {})
+      },
+
       /**
        * 签到完成提示浮层5s后隐藏
        */
@@ -496,7 +550,7 @@
         this.$http({
           method: 'get',
           url:this.signstate.ruleLink,
-//          url: 'api/center/wap/rule/sign.html',
+          // url: 'api/center/wap/rule/sign.html',
           params: {
             mpid: this.mpid
           }
@@ -505,7 +559,26 @@
             this.ruleScoreList = result.data.data.attach
             this.ruleBase = result.data.data.base
             this.ruleFull = result.data.data.full
+            this.randscore = result.data.data.randscore
             this.signRuleShow = true
+          }
+        }).catch((result) => {
+        })
+      },
+      /**
+       * 手机是否绑定过
+       */
+      isBindPhone(){
+        this.$http({
+          method: 'get',
+          url: this.url+'/user/wap/user/phone',
+          // url: 'api/user/wap/user/phone.html',
+          params: {
+            mpid: this.mpid
+          }
+        }).then((result) => {
+          if (result.data.status == '1') {
+            this.isBind = result.data.data.is_bind
           }
         }).catch((result) => {
         })
@@ -536,7 +609,7 @@
         this.signScroll()
       },
       /**
-       * 显示签到浮层，今日需要默认在当前屏
+       * 显示签到浮层，今日需要默认在当前f屏
        */
       signScroll() {
         let w = $(".date").width();
