@@ -22,7 +22,7 @@
               <div class="sign-text" v-if="signstate.todaySign===0" @click="signFun">
                 <p class="theme-color" :style="{'color':word}">签到</p>
               </div>
-              <div class="sign-success" v-if="signstate.todaySign===1" @click="resignFun">
+              <div class="sign-success" v-if="signstate.todaySign===1">
                 <span class="theme-color" :style="{'color':word}">已连续签到</span>
                 <p class="theme-color" :style="{'color':word}">{{signstate.days}}天</p>
               </div>
@@ -32,9 +32,9 @@
               </div>
             </div>
           </div>
-          <div class="sign-date"  @click="resignFun">
+          <div class="sign-date">
             <div class="sign-date-inner" id="sign-date-inner">
-              <div class="date-box" v-for="sign in signArray">
+              <div class="date-box" v-for="(sign, index) in signArray">
                 <div class="date date-before-sign-in" v-if="sign.type ==='before' && sign.signTag ===1">
                   <i :style="{'background-color':word}">
                     <em class="left" :style="{'background-color':word}"></em>
@@ -42,7 +42,7 @@
                   </i>
                   {{sign.num}}
                 </div>
-                <div class="date date-before-sign" @click="resignFun" v-if="sign.type==='before' && sign.signTag ===0"
+                <div :class="{date: true, 'date-before-sign': true, canSign: sign.canSign}" @click="resignFun({sign,index})" v-if="sign.type==='before' && sign.signTag ===0"
                      :style="{'color':word}" >
                   <i :style="{'border-color':word}"><em
                     class="left"></em><em class="right"></em></i>
@@ -169,6 +169,17 @@
       </div>
     </div>
 
+    <!-- resign -->
+    <div class="resign-modal-box" v-show="resignModalShow">
+      <div class="resign-modal-inner">
+        <h5 :style="{'color':word}">提醒</h5>
+        <p>此次补签将消耗您<span :style="{'color':word}">{{cost}}</span>{{unitStr}}</p>
+
+        <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure"
+           @click="resignModalShow = !resignModalShow">好</a>
+      </div>
+    </div>
+
     <!--sign result-->
     <div class="sign-modal-box" v-show="signModalShow">
       <div class="sign-modal-inner">
@@ -248,6 +259,8 @@
         signModalTitle: "",
         signModalLock: true,
         signModalShow: false,
+        resignModalLock: true,
+        resignModalShow: false,
         ruleScoreList: [],
         ruleBase: 0,
         ruleFull: 0,
@@ -259,6 +272,7 @@
         mpQrcode: "",
         shareList:{},
         unitStr:'',
+        cost: '', //补签消耗
         adheight:'',//广告图片高度
         detailUrl:'##',//个人资料页面跳转
         bindphoneUrl:'',//绑定手机页面跳转
@@ -280,6 +294,7 @@
       this.isBindPhone();
     },
     mounted() {
+      //window.vm = this;
     },
     methods: {
       /**
@@ -366,43 +381,71 @@
                 this.signstate.days = userReault[i].days;
                 this.signList = userReault[i].log;
 
-                let limit = userReault[i].resignLimitNum;
-                let signListArray = [];
-                for (let i in this.signList) {
-                  // signListArray.push(this.signList[i])
-                  signListArray.push({
-                    tag: this.signList[i],
-                    date: i
-                  })
-                }
-                let dayNum = 0;
-                for (let x = 0; x < signListArray.length; x++) {
-                  dayNum++;
-                  if (dayNum == this.day) {
-                    this.signArray.push({
-                      num: `${this.month}.${dayNum}`,
-                      signTag: signListArray[x].tag,
-                      date: signListArray[x].date,
-                      type: "day",
-                    })
-                  } else {
-                    this.signArray.push({
-                      num: `${this.month}.${dayNum}`,
-                      signTag: signListArray[x].tag,
-                      date: signListArray[x].date,
-                      type: "before",
-                      canSign: signListArray[x].tag === 0 &&  this.day - dayNum <= limit
+                this.$http({
+                  method: 'get',
+                  // url: this.signstate.ruleLink,
+                  url: 'api/center/wap/rule/sign.html?mpid=18'
+                }).then(res => {
+                  if(res.data.e == 9999){
+                    var resignData = res.data.data;
+                    if('resign' in resignData){
+                      this.cost = resignData.resign;
+                    }
+
+                    let limit = userReault[i].resignLimitNum;
+                    let signListArray = [];
+                    for (let i in this.signList) {
+                      // signListArray.push(this.signList[i])
+                      signListArray.push({
+                        tag: this.signList[i],
+                        date: i
+                      })
+                    }
+                    let dayNum = 0;
+                    for (let x = 0; x < signListArray.length; x++) {
+                      dayNum++;
+                      if (dayNum == this.day) {
+                        this.signArray.push({
+                          num: `${this.month}.${dayNum}`,
+                          signTag: signListArray[x].tag,
+                          date: signListArray[x].date,
+                          type: "day",
+                        })
+                      }else if(dayNum === this.day -1){
+                          this.signArray.push({
+                            num: `${this.month}.${dayNum}`,
+                            signTag: signListArray[x].tag,
+                            date: signListArray[x].date,
+                            type: "before",
+                            canSign: true,
+                            yesterday: true,
+                          })
+                      } else {
+
+                        this.signArray.push({
+                          num: `${this.month}.${dayNum}`,
+                          signTag: signListArray[x].tag,
+                          date: signListArray[x].date,
+                          type: "before",
+                          canSign: this.cost &&  this.day - dayNum <= limit
+                        })
+                      }
+                    }
+                    for (let a = signListArray.length; a < this.monthNum; a++) {
+                      dayNum++;
+                      this.signArray.push({
+                        num: `${this.month}.${dayNum}`,
+                        signTag: 0,
+                        type: "after"
+                      })
+                    }
+                    this.$nextTick(() => {
+                      //签到日期，当前日期在可视区域内
+                      this.signScroll();
                     })
                   }
-                }
-                for (let a = signListArray.length; a < this.monthNum; a++) {
-                  dayNum++;
-                  this.signArray.push({
-                    num: `${this.month}.${dayNum}`,
-                    signTag: 0,
-                    type: "after"
-                  })
-                }
+                })
+
               }
               if (userReault[i].class == 'Mp') {
                 this.mpQrcode = userReault[i].mpqrcode
@@ -507,12 +550,17 @@
       /**
        * 补签的英文是什么
        */
-      resignFun() {
-        console.log(1);
+      resignFun(option) {
+
+        console.log(option);
+        let {sign, index} = option;
+
+        var that = this;
         if(!sign.canSign) return;
-        if (!this.signModalLock) {
+        if (!this.resignModalLock) {
           return false
         }
+        this.resignModalLock = !this.resignModalLock;
         this.$http({
           method: 'get',
           // url: this.signstate.signUrl,
@@ -523,7 +571,23 @@
           }
         }).then((result) => {
           console.log(result);
-        }).catch(result => {})
+           //debugger;
+          if(result.data.status == 1){
+            var fee = result.data.data.changeScore;
+
+            if(!sign.yesterday){
+              this.resignModalShow = true;
+            }
+            // this.cost = fee;
+            this.score.baseNum -= fee;
+            this.score.scoreNum  = this.formatInt(this.score.baseNum);
+
+            this.signArray[index].signTag = 1
+          }
+          this.resignModalLock = true;
+        }).catch(result => {
+          console.log(result)
+        })
       },
 
       /**
