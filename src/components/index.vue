@@ -312,8 +312,8 @@
       load() {
         this.$http({
           method: 'get',
-          // url: this.url+'/center/wap/center/set',
-          url: 'api/center/wap/center/set.html',
+          url: this.url+'/center/wap/center/set',
+          // url: 'api/center/wap/center/set.html',
           params: {
             mpid: this.mpid
           }
@@ -383,8 +383,8 @@
 
                 this.$http({
                   method: 'get',
-                  // url: this.signstate.ruleLink,
-                  url: 'api/center/wap/rule/sign.html?mpid=18'
+                  url: this.signstate.ruleLink,
+                  // url: 'api/center/wap/rule/sign.html?mpid=18'
                 }).then(res => {
                   if(res.data.e == 9999){
                     var resignData = res.data.data;
@@ -523,7 +523,7 @@
           url: this.signstate.signUrl,
           //url: 'api/user/wap/sign/sign.html',
           params: {
-            // mpid: this.mpid
+            mpid: this.mpid
           }
         }).then((result) => {
           if (result.data.e == '9999') {
@@ -563,10 +563,10 @@
         this.resignModalLock = !this.resignModalLock;
         this.$http({
           method: 'get',
-          // url: this.signstate.signUrl,
-          url: 'api/user/wap/sign/re-sign?mpid=18',
+          url: this.url + '/user/wap/sign/re-sign',
+          // url: 'api/user/wap/sign/re-sign?mpid=18',
           params: {
-            // mpid: this.mpid
+            mpid: this.mpid,
             resignDate: sign.date
           }
         }).then((result) => {
