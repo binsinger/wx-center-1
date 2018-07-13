@@ -287,7 +287,7 @@
       this.url = window.location.origin
       this.mpid = this.init("mpid")
 
-      this.mpid = 18
+      //this.mpid = 18
 
       this.load();
       this.timeFun();
