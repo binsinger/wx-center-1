@@ -521,7 +521,7 @@
         this.$http({
           method: 'get',
           url: this.signstate.signUrl,
-//          url: 'api/user/wap/sign/sign.html',
+          //url: 'api/user/wap/sign/sign.html',
           params: {
             // mpid: this.mpid
           }
