@@ -15,7 +15,8 @@
         <p class="theme-bg-color" :style="{'background-color':word}">签到有礼<img src="../assets/images/icon-1.png"/></p>
       </div>
       <transition name="down">
-        <div class="sign-box" v-show="show" style="background:#f00">
+        <!-- <div class="sign-box" v-show="show" style="background:#f00"> -->
+        <div class="sign-box" v-show="show">
           <div class="sign-drop">
             <img src="/wap/center/static/img/head-bg.jpg"/>
             <div class="sign-inner">
@@ -188,7 +189,8 @@
     </div>
 
     <!--attract-->
-    <div class="share-modal-box" v-show="false && shareModalShow">
+    <div class="share-modal-box" v-show="shareModalShow">
+    <!-- <div class="share-modal-box" v-show="false && shareModalShow"> -->
       <div class="share-modal-inner">
         <div class="title">
           <img src="/wap/center/static/img/subscribe-box.png"/>
