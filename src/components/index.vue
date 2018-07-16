@@ -15,8 +15,8 @@
         <p class="theme-bg-color" :style="{'background-color':word}">签到有礼<img src="../assets/images/icon-1.png"/></p>
       </div>
       <transition name="down">
-        <!-- <div class="sign-box" v-show="show" style="background:#f00"> -->
-        <div class="sign-box" v-show="show">
+        <div class="sign-box" v-show="show" style="background:#f00">
+        <!-- <div class="sign-box" v-show="show"> -->
           <div class="sign-drop">
             <img src="/wap/center/static/img/head-bg.jpg"/>
             <div class="sign-inner">
@@ -36,6 +36,7 @@
           <div class="sign-date">
             <div class="sign-date-inner" id="sign-date-inner">
               <div class="date-box" v-for="(sign, index) in signArray">
+              <!-- 之前已签 -->
                 <div class="date date-before-sign-in" v-if="sign.type ==='before' && sign.signTag ===1">
                   <i :style="{'background-color':word}">
                     <em class="left" :style="{'background-color':word}"></em>
@@ -43,23 +44,35 @@
                   </i>
                   {{sign.num}}
                 </div>
-                <div :class="{date: true, 'date-before-sign': true, canSign: sign.canSign}" @click="resignFun({sign,index})" v-if="sign.type==='before' && sign.signTag ===0"
-                     :style="{'color':word}" >
-                  <i :style="{'border-color':word}"><em
-                    class="left"></em><em class="right"></em></i>
-                  {{sign.num}}
-                </div>
+                <!-- 之前未签 -->
+                <template v-if="sign.type==='before' && sign.signTag ===0">
+                  <!-- 可补签 -->
+                  <div v-if="sign.canSign" class="date date-before-sign canSign" @click="preResign({sign,index})"
+                       :style="{'color':word}" >
+                    <i :style="{'border-color':word}"><em
+                      class="left"></em><em class="right"></em></i>
+                    {{sign.num}}
+                  </div>
+                  <!-- 不可补签 -->
+                   <div v-else class="date date-after-sign"><i><em class="left"></em><em
+                    class="right"></em></i>{{sign.num}}
+                  </div>
+
+                </template>
+                <!-- 今天未签 -->
                 <div class="date date-on-sign" v-if="sign.type==='day' && signstate.todaySign ===0">
                   <i
                     :style="{'border-color':word}"><em class="left"></em><em
                     class="right"></em></i>今日
                 </div>
+                <!-- 今天已签 -->
                 <div class="date date-on-sign-in" v-if="sign.type==='day' && signstate.todaySign ===1"
                      :style="{'color':word}">
                   <i :style="{'background-color':word,}">
                     <em class="left" :style="{'background-color':word}"></em>
                     <em class="right" :style="{'background-color':word}"></em></i>今日
                 </div>
+                <!-- 之后 -->
                 <div class="date date-after-sign" v-if="sign.type==='after'"><i><em class="left"></em><em
                   class="right"></em></i>{{sign.num}}
                 </div>
@@ -165,6 +178,10 @@
           :style="{'color':word}">{{rslist[1]}}</span>{{unitStr}}</p>
         <p v-if="ruleFull">每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>{{unitStr}}</p>
         <p v-if="randscore">每天签到可获得<span :style="{'color':word}">{{randscore.min}}</span>到<span :style="{'color':word}">{{randscore.max}}</span>之间随机{{unitStr}}</p>
+        <template>
+          <p v-if="cost">支持当月补签功能，前一日补签不需要{{unitStr}}，之前日期补签需要消耗<span :style="{'color':word}">{{ruleBase}}</span>{{unitStr}}</p>
+          <p v-else>支持昨日补签。补签不能获得{{unitStr}}，只获得连续签到奖励资格。</p>
+        </template>
         <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure"
            @click="signRuleShow = !signRuleShow">确定</a>
       </div>
@@ -175,9 +192,18 @@
       <div class="resign-modal-inner">
         <h5 :style="{'color':word}">提醒</h5>
         <p>此次补签将消耗您<span :style="{'color':word}">{{cost}}</span>{{unitStr}}</p>
-
-        <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure"
-           @click="resignModalShow = !resignModalShow">好</a>
+        <div class="btn-group">
+          <a href="javascript:void(0);" class="btn-cancel" @click="resignModalShow = !resignModalShow">取消</a>
+          <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure" @click="resignFun">确认</a>
+        </div>
+      </div>
+    </div>
+    <!-- resign ok -->
+    <div class="resign-modal-box" v-show="resignOk">
+      <div class="resign-modal-inner">
+        <h5 :style="{'color':word}">提醒</h5>
+        <p>您已补签成功。</p>
+        <a href="javascript:void(0);" :style="{'background-color':word}" class="resign-ok" @click="resignOk = !resignOk">好</a>
       </div>
     </div>
 
@@ -189,8 +215,8 @@
     </div>
 
     <!--attract-->
-    <div class="share-modal-box" v-show="shareModalShow">
-    <!-- <div class="share-modal-box" v-show="false && shareModalShow"> -->
+    <!-- <div class="share-modal-box" v-show="shareModalShow"> -->
+    <div class="share-modal-box" v-show="false && shareModalShow">
       <div class="share-modal-inner">
         <div class="title">
           <img src="/wap/center/static/img/subscribe-box.png"/>
@@ -263,6 +289,8 @@
         signModalShow: false,
         resignModalLock: true,
         resignModalShow: false,
+        resignOk: false,
+        resign: {},
         ruleScoreList: [],
         ruleBase: 0,
         ruleFull: 0,
@@ -287,7 +315,7 @@
       this.url = window.location.origin
       this.mpid = this.init("mpid")
 
-      //this.mpid = 18
+      this.mpid = 18
 
       this.load();
       this.timeFun();
@@ -314,8 +342,8 @@
       load() {
         this.$http({
           method: 'get',
-          url: this.url+'/center/wap/center/set',
-          // url: 'api/center/wap/center/set.html',
+          // url: this.url+'/center/wap/center/set',
+          url: 'api/center/wap/center/set.html',
           params: {
             mpid: this.mpid
           }
@@ -385,8 +413,8 @@
 
                 this.$http({
                   method: 'get',
-                  url: this.signstate.ruleLink,
-                  // url: 'api/center/wap/rule/sign.html?mpid=18'
+                  // url: this.signstate.ruleLink,
+                  url: 'api/center/wap/rule/sign.html?mpid=18'
                 }).then(res => {
                   if(res.data.e == 9999){
                     var resignData = res.data.data;
@@ -552,21 +580,22 @@
       /**
        * 补签的英文是什么
        */
-      resignFun(option) {
+      resignFun() {
 
-        console.log(option);
-        let {sign, index} = option;
+        // console.log(option);
+        let {sign, index} = this.resign;
 
         var that = this;
-        if(!sign.canSign) return;
+        this.resignModalShow = false;
+        // if(!sign.canSign) return;
         if (!this.resignModalLock) {
           return false
         }
         this.resignModalLock = !this.resignModalLock;
         this.$http({
           method: 'get',
-          url: this.url + '/user/wap/sign/re-sign',
-          // url: 'api/user/wap/sign/re-sign?mpid=18',
+          // url: this.url + '/user/wap/sign/re-sign',
+          url: 'api/user/wap/sign/re-sign?mpid=18',
           params: {
             mpid: this.mpid,
             resignDate: sign.date
@@ -577,8 +606,8 @@
           if(result.data.status == 1){
             var fee = result.data.data.changeScore;
 
-            if(!sign.yesterday){
-              this.resignModalShow = true;
+            if(sign.yesterday){
+              this.resignOk = true;
             }
             // this.cost = fee;
             this.score.baseNum -= fee;
@@ -590,6 +619,18 @@
         }).catch(result => {
           console.log(result)
         })
+      },
+      /**
+       * 补签弹窗提醒
+       */
+      preResign(option) {
+        this.resign = option;
+        let {sign, index} = option;
+        if(sign.yesterday){
+          this.resignFun()
+        }else{
+          this.resignModalShow = true;
+        }
       },
 
       /**
@@ -615,8 +656,8 @@
       signRule() {
         this.$http({
           method: 'get',
-          url:this.signstate.ruleLink,
-          // url: 'api/center/wap/rule/sign.html',
+          // url:this.signstate.ruleLink,
+          url: 'api/center/wap/rule/sign.html',
           params: {
             mpid: this.mpid
           }

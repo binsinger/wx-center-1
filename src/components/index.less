@@ -766,16 +766,35 @@
         .margin(0, 10);
       }
     }
-    .btn-sure {
-      .font-line(30, 70);
+    .btn-group{
+      .mtop(40);
+      .mbottom(20);
+      display: flex;
+      justify-content: space-around;
       text-align: center;
+      .btn-sure,
+      .btn-cancel{
+        color: @white;
+        .wh(200, 70);
+         .font-line(30, 70);
+        .border-radius(10);
+      }
+      .btn-cancel{
+        border: 1px solid #9198ab;
+        color: #9198ab;
+      }
+    }
+    .resign-ok {
       color: @white;
       .wh(200, 70);
+      .font-line(30, 70);
+      .border-radius(10);
+      color: @white;
+      text-align: center;
       display: block;
       margin: 0 auto;
       .mtop(40);
       .mbottom(20);
-      .border-radius(35);
     }
 
   }
