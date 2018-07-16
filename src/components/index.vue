@@ -179,7 +179,7 @@
         <p v-if="ruleFull">每月全勤签满，可额外获得<span :style="{'color':word}">{{ruleFull}}</span>{{unitStr}}</p>
         <p v-if="randscore">每天签到可获得<span :style="{'color':word}">{{randscore.min}}</span>到<span :style="{'color':word}">{{randscore.max}}</span>之间随机{{unitStr}}</p>
         <template>
-          <p v-if="cost">支持当月补签功能，前一日补签不需要{{unitStr}}，之前日期补签需要消耗<span :style="{'color':word}">{{ruleBase}}</span>{{unitStr}}</p>
+          <p v-if="cost">支持当月补签功能，前一日补签不需要{{unitStr}}，之前日期补签需要消耗<span :style="{'color':word}">{{cost}}</span>{{unitStr}}</p>
           <p v-else>支持昨日补签。补签不能获得{{unitStr}}，只获得连续签到奖励资格。</p>
         </template>
         <a href="javascript:void(0);" :style="{'background-color':word}" class="btn-sure"
