@@ -423,6 +423,7 @@
                     }
 
                     let limit = userReault[i].resignLimitNum;
+                    // let limit = 2;
                     let signListArray = [];
                     for (let i in this.signList) {
                       // signListArray.push(this.signList[i])
@@ -551,7 +552,7 @@
         this.$http({
           method: 'get',
           url: this.signstate.signUrl,
-          //url: 'api/user/wap/sign/sign.html',
+          // url: 'api/user/wap/sign/sign.html',
           params: {
             mpid: this.mpid
           }
@@ -605,10 +606,12 @@
            //debugger;
           if(result.data.status == 1){
             var fee = result.data.data.changeScore;
+            var days = result.data.data.days;
 
             if(sign.yesterday){
               this.resignOk = true;
             }
+            this.signstate.days = days;
             // this.cost = fee;
             this.score.baseNum -= fee;
             this.score.scoreNum  = this.formatInt(this.score.baseNum);
