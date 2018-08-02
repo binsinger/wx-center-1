@@ -38,7 +38,29 @@
     }
     .user-name {
       flex: 1;
-      p {
+      a {
+        color: @white;
+        .font-line(34, 34);
+        display: block;
+      }
+      a.tz{
+        &:after {
+          content: "";
+          .wh(14, 34);
+          .mleft(20);
+          display: inline-block;
+          vertical-align: middle;
+          background: url('../assets/images/icon-1.png') no-repeat center center;
+          background-size: 100% auto;
+          .mtop(-5);
+        }
+      }
+      .userphonetz {
+        .font-line(24, 40);
+        color: @white;
+        .mtop(14);
+      }
+      /* p {
         color: @white;
         .font-line(34, 34);
         display: inline-block;
@@ -56,7 +78,7 @@
       span {
         .font-line(24, 40);
         color: #cbc6c6;
-      }
+      } */
     }
     .btn-sign-down {
       position: fixed;
